@@ -126,9 +126,10 @@ export default class Handle extends Component {
     if (!disabled && !readOnly && this.state.active) {
       event.stopPropagation();
       event.preventDefault();
-      this._move(event, getMousePosition(event.touches[0], this.props.orientation));
+      this._move(event, getMousePosition(event.changedTouches[0], this.props.orientation));
       this._moveEnd(event.touches[0]);
-      this.props.afterChange();
+      /** Commeting this because we are already calling afterChange method in _moveEnd method */
+      // this.props.afterChange();
     }
   };
 
@@ -173,6 +174,11 @@ export default class Handle extends Component {
       active: false,
       activeCount: 0,
     });
+    const { disabled, readOnly } = this.props;
+    /** This method will be called when handle stop moving */
+    if (!disabled && !readOnly) {
+      this.props.afterChange();
+    }
   };
 
   _onFocus: Function = (): void => {
@@ -230,8 +236,8 @@ export default class Handle extends Component {
         tabIndex={tabIndex}
         className={
           (disabled && disabledClassName) ?
-          `handle ${disabledClassName}` :
-          `handle ${className}`
+            `handle ${disabledClassName}` :
+            `handle ${className}`
         }
         onFocus={this._onFocus}
         onBlur={this._onBlur}
